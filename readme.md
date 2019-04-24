@@ -73,7 +73,7 @@ $ npm install babel-plugin-esx-ssr
 
 The function to use to create the DOM tree.
 
-### `include` (default: `import React from `react`)
+### `include` (default: `import React from 'react'`)
 
 Includes additional module loading statement at the top
 of any script/module that contains any ESX statements.
