@@ -1,6 +1,6 @@
 {
-  "version": "0.0.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Babel plugin to convert ESX to",
   "author": "David Mark Clements <david.mark.clements@gmail.com>",
   "devDependencies": {},
   "scripts": {},
@@ -8,5 +8,19 @@
   "dependencies": {
     "babylon": "^6.18.0",
     "esx": "^2.1.0"
-  }
+  },
+  "name": "babel-plugin-esx-browser",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esxjs/babel-plugin-esx-browser.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/esxjs/babel-plugin-esx-browser/issues"
+  },
+  "homepage": "https://github.com/esxjs/babel-plugin-esx-browser#readme"
 }
