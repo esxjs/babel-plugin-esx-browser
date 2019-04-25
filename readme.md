@@ -4,7 +4,7 @@ Babel plugin to prepare ESX for production-ready browser code.
 
 ## Status
 
-Stable.
+Experimental.
 
 ## Example
 
