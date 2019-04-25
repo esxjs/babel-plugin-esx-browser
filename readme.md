@@ -53,8 +53,6 @@ $ npm install babel-plugin-esx-ssr
 
 ## Usage
 
-### Via `.babelrc` (Recommended)
-
 **.babelrc**
 
 ```json
