@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "description": "Babel plugin to convert ESX to",
+  "description": "Babel plugin to prepare ESX for production-ready browser code.",
   "author": "David Mark Clements <david.mark.clements@gmail.com>",
   "devDependencies": {},
   "scripts": {},

@@ -1,6 +1,6 @@
 # babel-plugin-esx-browser
 
-Babel plugin to convert ESX to 
+Babel plugin to prepare ESX for production-ready browser code.
 
 ## Status
 
