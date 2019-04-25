@@ -1,4 +1,5 @@
 'use strict'
+const babylon = require('babylon')
 const parse = require('esx/lib/parse')
 const { marker } = require('esx/lib/symbols')
 const components =  new Proxy({}, {
@@ -8,7 +9,6 @@ const components =  new Proxy({}, {
     return o[p]
   }
 })
-
 function converter ({ pragma }) {
   const rx = RegExp(`^${pragma.replace(/\./, '\\.')}\\(|^"`)
   const convert = (strings, expressions) => {
@@ -83,16 +83,75 @@ function converter ({ pragma }) {
   return convert
 }
 
-function transform({ types }, options = {}) {
+function required (mod, path) {
+  const { node } = path
+  const { name } = node.callee
+  if (name !== 'require') return false
+  const [ arg ] = node.arguments
+  return (arg.value === mod) 
+}
+
+function transform(_, options = {}) {
   const { 
-    pragma = 'React.createElement'
+    framework = 'React',
+    include = 'import'
   } = options
+
+  const pragma = framework === 'React' ? 'React.createElement' : false
+  if (pragma === false) {
+    throw Error('React is currently the only supported framework')
+  }
+  if (include !== 'import' && include !== 'require') {
+    throw Error('Include option must be either import or require')
+  }
   const convert = converter({ pragma })
+  const load = include === 'import' ? 
+    `import React from 'react'` :
+    `const React = require('react')`
+  var reactIncluded = false
 	return {
 		name: 'esx',
 		visitor: {
+      Program: {
+        exit ({node}) {
+          if (reactIncluded) return
+          const [ inject ] = babylon.parse(load, {
+            allowImportExportEverywhere: true
+          }).program.body
+          const { body } = node
+          body.unshift(inject)
+        }
+      },
+      CallExpression (path) {
+        if (required('react', path) && path.parentPath.node.id) {
+          if (path.parentPath.node.id.name === 'React') {
+            reactIncluded = true
+          }
+        }
+        if (required('esx', path)) {
+          path.parentPath.parentPath.remove()
+        }
+      },
+      ImportDeclaration (path) {
+        path.get('specifiers')
+          .filter(({node}) => node.type === 'ImportDefaultSpecifier')
+          .forEach(({parent}) => {
+            const { source } = parent
+            const { local } = parent.specifiers
+              .find(({type}) => type === 'ImportDefaultSpecifier')
+            if (local.name === 'React' && source.value == 'react') {
+              reactIncluded = true
+            }
+          })
+      },
+      MemberExpression (path) {
+        const { node } = path
+        const { object, property } = node
+        if (property.name === 'register' && object.name === 'esx') {
+          path.parentPath.remove()
+        }
+      },
 			TaggedTemplateExpression (path, { file }) {
-        if (path.node.tag.name !== tag) return
         const { quasi } = path.node
         const { quasis, expressions } = quasi
         const strings = quasis.map(({value}) => value.cooked)
@@ -101,7 +160,7 @@ function transform({ types }, options = {}) {
         const converted = convert(strings, expressions)
         path.replaceWithSourceString(converted)
       }
-		}
+    }
 	}
 }
 

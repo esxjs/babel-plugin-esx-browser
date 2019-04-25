@@ -6,6 +6,7 @@
   "scripts": {},
   "keywords": [],
   "dependencies": {
+    "babylon": "^6.18.0",
     "esx": "^2.1.0"
   }
 }

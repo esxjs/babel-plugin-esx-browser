@@ -1,5 +1,4 @@
-const esx = require('esx')();
-
+import React from 'react';
 const data = {
   value: 'hi'
 };
@@ -7,10 +6,6 @@ const data = {
 const Component = ({
   value
 }) => React.createElement('div', {}, [React.createElement('p', {}, " some content "), React.createElement('p', {}, [" some ", value])]);
-
-esx.register({
-  Component
-});
 
 const App = () => React.createElement(Component, data);
 

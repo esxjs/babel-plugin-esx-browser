@@ -4,7 +4,7 @@ Babel plugin to convert ESX to
 
 ## Status
 
-Incomplete. 
+Experimental.
 
 ## Example
 
@@ -31,8 +31,7 @@ export default App
 **Out**
 
 ```js
-import React from 'react'
-
+import React from 'react';
 const data = {
   value: 'hi'
 };
@@ -61,22 +60,29 @@ $ npm install babel-plugin-esx-ssr
 ```json
 {
   "plugins": ["esx-ssr", {
-     "pragma": "React.createElement",
-     "include": "import React from 'react'"
+     "framework": "React",
+     "include": "import"
   }]
 }
 ```
 
 ## Options
 
-### `pragma` (default: `React.createElement`)
+### `framework` (default: `React`)
 
-The function to use to create the DOM tree.
+Currently the only available option is `React`.
 
-### `include` (default: `import React from 'react'`)
+When set to `React` all elements are created
+with `React.createElement` and if React has not
+been included into a script, it will be added 
+with either `import` or `require` as per the `include`
+option.
 
-Includes additional module loading statement at the top
-of any script/module that contains any ESX statements.
+### `include` (default: `import`)
+
+May be either `import` or `require`. If the framework
+hasn't been added to a script, it will included 
+with the module syntax specified.
 
 ## Requirements
 
