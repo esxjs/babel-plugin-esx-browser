@@ -2,13 +2,14 @@
   "name": "example",
   "version": "1.0.0",
   "scripts": {
-    "build": "babel input.js > output.js"
+    "build": "babel input.js > output.js",
+    "build-with-preset-env": "babel --config-file ./babelrc-preset-env input.js > output-preset-env.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3"
   },
   "dependencies": {
-    "@babel/preset-react": "^7.0.0"
+    "@babel/preset-env": "^7.4.3"
   }
 }

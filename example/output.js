@@ -4,10 +4,20 @@ const data = {
 };
 
 const Component = ({
-  value
-}) => React.createElement('div', {}, [React.createElement('p', {}, " some content "), React.createElement('p', {}, [" some ", value])]);
+  value,
+  prop,
+  title
+}) => React.createElement('div', null, [React.createElement('p', null, [" some content: ", title]), React.createElement('p', null, [" some ", value]), React.createElement('p', null, [" some ", prop, " prop "])]);
 
-const App = () => React.createElement(Component, data);
+const App = ({
+  title
+}) => {
+  return React.createElement(Component, {
+    prop: "static",
+    ...data,
+    title: title
+  });
+};
 
 export default App;
 

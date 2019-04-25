@@ -13,17 +13,19 @@ Experimental.
 ```js
 const esx = require('esx')()
 const data = { value: 'hi' }
-
-const Component = ({ value }) => esx`
+const Component = ({ value, prop, title }) => esx`
   <div>
-    <p> some content </p>
+    <p> some content: ${title} </p>
     <p> some ${value} </p>
+    <p> some ${prop} prop </p>
   </div>
 `
 
 esx.register({ Component })
 
-const App = () => esx`<Component ...${data}/>`
+const App = ({ title }) => {
+  return esx`<Component prop="static" ...${data} title=${title}/>`
+}
 
 export default App
 ```
@@ -37,12 +39,64 @@ const data = {
 };
 
 const Component = ({
-  value
-}) => React.createElement('div', {}, [React.createElement('p', {}, " some content "), React.createElement('p', {}, [" some ", value])]);
+  value,
+  prop,
+  title
+}) => React.createElement('div', null, [React.createElement('p', null, [" some content: ", title]), React.createElement('p', null, [" some ", value]), React.createElement('p', null, [" some ", prop, " prop "])]);
 
-const App = () => React.createElement(Component, data);
+const App = ({
+  title
+}) => {
+  return React.createElement(Component, {
+    prop: "static",
+    ...data,
+    title: title
+  });
+};
 
 export default App;
+```
+
+**Out when configured with @babel/preset-env**
+
+```js
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var data = {
+  value: 'hi'
+};
+
+var Component = function Component(_ref) {
+  var value = _ref.value,
+      prop = _ref.prop,
+      title = _ref.title;
+  return _react["default"].createElement('div', null, [_react["default"].createElement('p', null, [" some content: ", title]), _react["default"].createElement('p', null, [" some ", value]), _react["default"].createElement('p', null, [" some ", prop, " prop "])]);
+};
+
+var App = function App(_ref2) {
+  var title = _ref2.title;
+  return _react["default"].createElement(Component, _objectSpread({
+    prop: "static"
+  }, data, {
+    title: title
+  }));
+};
+
+var _default = App;
+exports["default"] = _default;
 ```
 
 ## Installation

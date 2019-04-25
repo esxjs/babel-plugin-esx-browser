@@ -19,8 +19,8 @@ function converter ({ pragma }) {
     while (i--) {
       const [tag, props, childMap, meta] = tree[i]
       const children = new Array(childMap.length)
-      const { dynAttrs, dynChildren, spread } = meta
-      const spreads = spread && Object.keys(spread).map(Number)
+      const { dynAttrs, dynChildren, spread, spreadIndices } = meta
+      const keys = Object.keys(props)
       for (var c in childMap) {
         if (typeof childMap[c] === 'number') {
           children[c] = map[childMap[c]]
@@ -28,18 +28,9 @@ function converter ({ pragma }) {
           children[c] = childMap[c] || null
         }
       }
-      if (spread) {
-        for (var sp in spread)  { 
-          const keys = Object.keys(expressions[sp])
-          for (var k in keys) {
-            if (spread[sp].after.indexOf(keys[k]) > -1) continue
-            props[keys[k]] = expressions[sp][keys[k]]
-          }
-        }
-      }
       if (dynAttrs) {
         for (var p in dynAttrs) {
-          const overridden = spread && spreads.filter((n => {
+          const overridden = spread && spreadIndices.filter((n => {
             return dynAttrs[p] < n
           })).some((n) => {
             return p in expressions[n] && spread[n].before.indexOf(p) > -1
@@ -54,25 +45,61 @@ function converter ({ pragma }) {
           children[n] = expressions[dynChildren[n]]
         }
       }
+      var serializedProps = 'null'
+      if (keys.length === 0 && spreadIndices.length === 1) {
+        serializedProps = source(expressions[spreadIndices[0]])
+      } else if (keys.length > 0 && spreadIndices.length === 0) {
+        serializedProps = serialize(props)
+      } else if (keys.length > 0 && spreadIndices.length > 0) {
+        serializedProps = '{'
+        for (const ix of spreadIndices) {
+          const {before, after} = spread[ix]
+          if (before.length > 0) serializedProps += kv(pick(props, before)) + ','
+          serializedProps += '...' + serialize(expressions[ix]) + ','
+          if (after.length > 0) serializedProps += kv(pick(props, after)) + ','
+        }
+        serializedProps = serializedProps.slice(0, -1) + '}'
+      }
       const reactChildren = children.length === 0 ? (props.children || null) : (children.length === 1 ? children[0] : children)
       if (reactChildren === null) {
-        map[i] = `${pragma}(${tag.name || `'${tag}'`}, ${serialize(props)})`
+        map[i] = `${pragma}(${tag.name || `'${tag}'`}, ${serializedProps})`
       } else {
-        map[i] = `${pragma}(${tag.name || `'${tag}'`}, ${serialize(props)}, ${serialize(reactChildren)})`
+        map[i] = `${pragma}(${tag.name || `'${tag}'`}, ${serializedProps}, ${serialize(reactChildren)})`
       }
     }
     return map[0]
   }
 
+  function pick (from, keys) {  
+    var filt = {}  
+    var i = keys.length
+    while (i--) {
+      var key = keys[i]
+      if (key in from) {
+        filt[key] = from[key]
+      }
+    }
+    return filt
+  }
+  function kv (o) {
+    var str = ''
+    for (const k in o) {
+      try { 
+        // passing through Function checks it the key
+        // is legal or needs to be quoted
+        str += Function(k, `return ${k}`)(k) + ':' + serialize(o[k]) + ','
+      } catch (e) {
+        str += JSON.stringify(k) + ':' + serialize(o[k]) + ','
+      }
+    }
+    return str.slice(0, -1)
+  }
   function serialize (o) {
     if (Array.isArray(o)) return '[' + o.map((o) => serialize(o)).join(', ') + ']'
     if (typeof o === 'string') return rx.test(o) ? o : JSON.stringify(o)
     if (typeof o === 'object') {
       if ('start' in o) return source(o)
-      var str = ''
-      for (const k in o) str += serialize(o[k]) + ','
-      str = '{' + str.slice(0, -1) + '}'
-      return str
+      return '{' + kv(o) + '}'
     }
   }
 
