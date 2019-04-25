@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Babel plugin to prepare ESX for production-ready browser code.",
   "author": "David Mark Clements <david.mark.clements@gmail.com>",
   "devDependencies": {},
