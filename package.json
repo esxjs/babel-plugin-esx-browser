@@ -11,9 +11,6 @@
   },
   "name": "babel-plugin-esx-browser",
   "main": "index.js",
-  "directories": {
-    "example": "example"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/esxjs/babel-plugin-esx-browser.git"
